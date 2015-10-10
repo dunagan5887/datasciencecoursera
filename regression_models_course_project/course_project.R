@@ -106,10 +106,10 @@ mtcarsRegressionAnalyzerFactory <- function()
             abline(h=mean_manual_mpg, lwd=1, col="Red")
             legend("topleft", col=c("Black", "Blue", "Red"), 
                    legend=c("Linear Relationship Fit", "Automatic Empirical Mean", "Manual Empirical Mean"),
-                   lty=c(1,1,1), lwd=c(2.5,2.5,2.5), cex=.85)
+                   lty=c(1,1,1), lwd=c(2.5,2.5,2.5), cex=.85, bty="n")
             legend("bottomright", col=c("Blue", "Red"), 
-                   legend=c("Automatic MPG Values", "Manual MPG Values"), pch=c(17,17), cex=.75)
-                   
+                   legend=c("Automatic MPG Values", "Manual MPG Values"), pch=c(17,17), 
+                   cex=.75, bty="n")
         })
         
         dev.copy(png, file="linear_regression_plot.png")
