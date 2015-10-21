@@ -23,11 +23,27 @@ groupedAndSummarizedDataRelatedToMotorVehicles <- summarize(dataRelatedToMotorVe
 
 groupedAndSummarizedDataRelatedToMotorVehicles$motor_vehicle_emissions <- as.numeric(groupedAndSummarizedDataRelatedToMotorVehicles$motor_vehicle_emissions);
 
-g <- ggplot(groupedAndSummarizedDataRelatedToMotorVehicles, aes(year, motor_vehicle_emissions, group = 1));
+# Center the data to make the change easier to see
+# Obtain centered Los Angeles County Emissions
+laData <- filter(groupedAndSummarizedDataRelatedToMotorVehicles, fips=="06037");
+number_of_years <- nrow(laData);
+la_emissions_sum <- sum(laData["motor_vehicle_emissions"]);
+la_mean_emissions <- la_emissions_sum / number_of_years;
+laData["centered_emissions"] <- laData["motor_vehicle_emissions"] - la_mean_emissions;
+# Obtain centered Baltimore City Emissions
+baltimoreData <- filter(groupedAndSummarizedDataRelatedToMotorVehicles, fips=="24510");
+baltimore_emissions_sum <- sum(baltimoreData["motor_vehicle_emissions"]);
+baltimore_mean_emissions <- baltimore_emissions_sum / number_of_years;
+baltimoreData["centered_emissions"] <- baltimoreData["motor_vehicle_emissions"] - baltimore_mean_emissions;
+# Create a new column in the data frame to hold the centered emissions
+centeredEmissionsData <- c(laData[["centered_emissions"]], baltimoreData[["centered_emissions"]]);
+groupedAndSummarizedDataRelatedToMotorVehicles["centered_emissions"] <- centeredEmissionsData;
+
+g <- ggplot(groupedAndSummarizedDataRelatedToMotorVehicles, aes(year, centered_emissions, group = 1));
 g <- g + geom_point(size=4, aes(color=fips));
 g <- g + facet_grid(. ~ fips);
 g <- g + geom_smooth(method = "lm", size=2, se=FALSE, aes(color=fips));
-g <- g + labs(title = "Baltimore City (24510) vs\nLos Angeles County (06037)\nPM2.5 Emissions From Motor\nVehicle Sources By Year") +  labs(x = "Year", y = "Motor Vehicle Emissions of PM2.5")
+g <- g + labs(title = "CENTERED PM2.5 Emissions from\nMotor Vehicle Sources in\nBaltimore City (24510) vs\nLos Angeles County (06037)\nTHE VALUES BELOW ARE CENTERED AROUND\nTHE MEAN TO MAKE THE CHANGE\nIN EMISSIONS MORE EVIDENT") +  labs(x = "Year", y = "CENTERED Motor Vehicle Emissions of PM2.5")
 print(g)
 
 dev.copy(png, file="plot6.png", width=600, height=600);
