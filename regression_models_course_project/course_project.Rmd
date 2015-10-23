@@ -1,20 +1,33 @@
 ---
-title: "Mtcars MPG against Transmission"
-author: "Sean Dunagan"
-date: "October 23, 2015"
+title: "MPG against Transmission"
+author: "Sean Dunagan - October 23, 2015"
 output: html_document
 ---
 
 <style type="text/css">
 
 body, td {
-   font-size: 12px;
+   font-size: 14px;
+}
+h1{
+    font-size: 24px;
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+h4
+{
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 code.r{
-  font-size: 10px;
+  font-size: 12px;
 }
 pre {
-  font-size: 10px
+  font-size: 12px;
+  padding: 0px;
+}
+img{
+    height: 480px; width:580px;
 }
 </style>
 
@@ -26,18 +39,11 @@ mtcarsRegressionAnalyzerInstance$separateAutomaticAndManualTransmissionCars();
 
 ```
 
-## Prompt
-You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
+#### Executive Summary
+As detailed below, there does appear to be a difference in MPG between Automatic and Manual transmission types. Manual transmission types appear to provide better MPG values when accounting for other relevant variables such as the Weight of the car, the number of Cylinders of the car, and the number of Carburetors. The estimated difference in MPG is about 1.78 more miles per gallon, obtained with 75.1% confidence via a linear model fitting MPG against Transmission Type, Weight, Cylinders and Carburetors.
 
-1. Is an automatic or manual transmission better for MPG
-2. Quantify the MPG difference between automatic and manual transmissions
-
-Take the mtcars data set and write up an analysis to answer their question using regression models and exploratory data analyses.
-
-Naturally units for every measurement of MPG given are Miles per Gallon.
-
-## Exploratory Data Analyses
-A natural first step in addressing these questions would be to see the distribution of MPG values for each transmissions type. Figure 1 in the Appendix (MPG by Transmission Type) displays this visually via a boxplot. It is easy to see via this boxplot that the MPG values tend to be higher for the Manual transmission type. The quantile data displayed in the boxplot is given below via the R summary() function for Automatic and Manual transmissions respectively
+#### Exploratory Data Analyses
+A natural first step in addressing these questions would be to see the distribution of MPG values for each transmissions type in the dataset we are using. Figure 1 in the Appendix (MPG by Transmission Type) displays this visually via a boxplot. It is easy to see via this boxplot that the MPG values tend to be higher for the Manual transmission type. The quantile data displayed in the boxplot is given below via the R summary() function for Automatic and Manual transmissions respectively
 
 ```{r, echo=FALSE}
 mtcarsRegressionAnalyzerInstance$summarizeMpgByAutomaticTransmission();
@@ -49,56 +55,102 @@ A natural next step would be to look at all of the variables contained in the mt
 head(mtcars, n = 1);
 ```
 
-## Regression Models
-An obvious model to explore would be the interaction between the transmission type and the MPG values. The coefficients for this linear model are given below (According to the ?mtcars R documentation, the values for am are 0 = automatic, 1 = manual):
+#### Regression Models
+An obvious model to explore would be the interaction between the transmission type and the MPG values. The coefficients for this linear model are given in Figure 7 of the Appendix (According to the ?mtcars R documentation, the values for am are 0 = automatic, 1 = manual):
 
-```{r}
-mpgByAmModel <- lm(mpg ~ am, data = mtcars);
-summary(mpgByAmModel)$coefficients;
+```{r echo = FALSE}
+mpgByAmModel <- lm(mpg ~ factor(am), data = mtcars);
 ```
 
-We can see from the coefficients above that the estimate for the intercept is 17.147368; this is the estimated MPG value for am values of 0 (meaning for Automatic Transmissions). The estimate for the am coefficient is 7.244939. This indicates that for an am value of 1 (Manual Transmissions) the estimated MPG value is the intercept (17.147368) + 7.244939; this yields an estimated MPG value of 24.39231 for Manual Transmissions. This also indicates that the difference in MPG values between transmission types is 7.244939 MPG. Figure 2 in the Appendix 
-displays this linear model visually, including lines denoting the mean estimated values for the transmission types.
+We can see from the coefficients in the figure that the estimate for the intercept is 17.147368; this represents the estimated MPG value for Automatic Transmissions. The estimate for the am coefficient is 7.244939. This indicates that for Manual Transmissions the estimated MPG value is 17.147368 + 7.244939; this yields an estimated MPG value of 24.39231 for Manual Transmissions. This also indicates that the difference in MPG values between transmission types is 7.244939 MPG.
 
-While this displays the relationship between MPG and transmission type, anyone with subject matter knowledge in the automotive realm will note that there are a couple of additional variables which are greatly correlated with the MPG value of a car (and which are not redundant to transmission type). To this note, the $R^2$ value of the mpg ~ am model is only 0.3598, meaning that only 36% of the variance in the data is explained by our mpg ~ am model. Surely there are other variables affecting the response (MPG).
+While this displays the relationship between MPG and transmission type, anyone with subject matter knowledge in the automotive realm will note that there are a number of additional variables which are significantly related to the MPG of a car (and which are not redundant to transmission type). To this note, the $R^2$ value of the mpg ~ am model is only 0.3598, meaning that only 35.98% of the variance in the data is explained by our mpg ~ am model. Surely there are other variables affecting the response (MPG).
 
-In particular, the number of cylinders and the weight of a car are very related to the MPG of a car. As such, we should inspect model which include these variables
+In particular, the number of cylinders and the weight of a car are very related to the MPG of a car. As such, we should inspect a model which includes these variables; Figure 4 in the Appendix displays the statistical data for this model.
 
-```{r}
-mpgByAmAndWeightAndCylindersModel <- lm(mpg ~ am + wt + cyl, data = mtcars);
-summary(mpgByAmAndWeightAndCylindersModel)$coefficients;
-summary(mpgByAmAndWeightAndCylindersModel)$r.squared;
+```{r echo = FALSE}
+mpgByAmAndWeightAndCylindersModel <- lm(mpg ~ factor(am) + wt + cyl, data = mtcars);
 ```
 
-The $R^2$ value for this model is 0.8303, MUCH higher than the mpg ~ am model; this indicates that our new model accounts for 47% more of the total variance in MPG than the previous model did. In terms of the variables themselves, the model indicates that both cyl and wt have an inverse relationship with MPG, meaning that an increase in the amount of cylinders or an increase in the weight of the car will decrease the MPG of the car. The P values for these two variables are each under .002, so we can conclude this with great certainty. However, for am, the P value is .893; looking at the standard error for am, we see that it is 1.3, greater than the estimate of 0.1765 for the coefficient. As such, we can't say with great confidence at all whether mpg is inversely or directly relatred to am. As such, we might look for another variable to reduce the standard error for am, since this is the variable we are particularly concerned with.
+The $R^2$ value for this model is 0.8303, MUCH higher than the 0.3598 value for the mpg ~ am model; this indicates that our new model accounts for 47% more of the total variance in MPG in the mtcars dataset than the previous model did. In terms of the regressors' coefficients, the model indicates that both cyl and wt have an inverse relationship with MPG, meaning that an increase in the amount of cylinders or an increase in the weight of the car will decrease the MPG of the car. The P values for these two variables are each under .002, so we can conclude this with over 99% certainty. However, for am, the P value is .893; looking at the standard error for am, we see that it is 1.3, greater than the estimate of 0.1765 for the coefficient. As such, we can't say with much confidence at all whether mpg is inversely or directly relatred to am. As such, we might look for another variable to include in the model to reduce the standard error for am, since this is the variable we are concerned with in particular.
 
-```{r}
-mpgByAmAndWeightAndCylindersAndCarbsModel <- lm(mpg ~ am + wt + cyl + carb, data = mtcars);
-summary(mpgByAmAndWeightAndCylindersAndCarbsModel)$coefficients;
-summary(mpgByAmAndWeightAndCylindersAndCarbsModel)$r.squared;
+```{r echo = FALSE}
+mpgByAmAndWeightAndCylindersAndCarbsModel <- lm(mpg ~ factor(am) + wt + cyl + carb, data = mtcars);
 ```
 
-Carburetors are responsible for fuel injection for the car's engine; as such, it would be very reasonable to assume that the number of carburetors is related to the MPG of a car. When we add this regressor to the model, we see the P value for the am regressor plummet to .249; at this point, we would say with 75.1% confidence that MPG increases as am increases (meaning with manual transmission). The estimate of 1.78 would suggest that Manual transmissions result in an average of 1.78 more miles per gallon for a car. Naturally, as we include more regressors into the model, the standaard errors of the other regressors increases. This is evidenced by the fact that the P values for the wt and cyl coefficients have increased by 609% and 733% respectively. However, given that the P values are still under .02, they are still within the typical 95% confidence interval. 
+Carburetors are responsible for fuel injection in the car's engine; as such, it would be very reasonable to assume that the number of carburetors is related to the MPG of a car. Figure 5 in the Appendix displays the statistics for such a model. When we add this regressor to the model, we see the P value for the am regressor plummet to .249; at this point, we would say with 75.1% confidence that MPG increases as am increases (meaning with manual transmission). The estimate of 1.78 would suggest that Manual transmissions result in an average of 1.78 more miles per gallon for a car than automatic transmissions. Naturally, as we include more regressors into the model, the actual standard error of the other regressors increases. This is evidenced by the fact that the P values for the wt and cyl coefficients have increased by 609% and 733% respectively. However, given that these P values are still under .02, they are still within the typical 95% confidence interval.
 
-```{r}
-anova(mpgByAmModel, mpgByAmAndWeightAndCylindersModel, mpgByAmAndWeightAndCylindersAndCarbsModel);
+Figure 6 in the Appendix shows a comparison of the 3 models discussed above. As we can see from the data, the Residual Sum of Squares decreases greatly with the addition of the wt, cyl, and carb regressor variables. 
+
+#### Answering the Question of Interest
+Given our model taking into account mpg ~ am + wt + cyl + carb, we obtained a regression coefficient of 1.78 for am, with standard error 1.51 and p value .249. As such, the coefficient is above 0 within the bounds of the standard error. Additionally, with a p value of .249, we would say with 75.1% confidence that Manual Transmissions lead to higher MPG values than Automatic transmissions. We would estimate that Manual Transmissions result in an average of 1.78 MPG greater than Automatic Transmissions.
+
+#### Residual Plot
+Figure 2 in the Appendix shows a residual plot. The X-axis on this plot is the residuals of model am ~ wt + cyl + carb; the Y-axis of this plot is the residuals of model mpg ~ wt + cyl + carb. This plot shows us the relationship between MPG and Transmission Type having factored out the other regressor variables wt, cyl and carb. We can see the fit of this plot showing an upward slope, meaning MPG increases from Automatic to Manual transmission type. In figure 8 in the Appendix, we can see the estimate for this slope by constructing a linear fit model for the residual plot and looking at the coefficients for the eAmAgainstWeightCylinderCarbs estimate. This is the same estimate as the am coefficient in the mpgByAmAndWeightAndCylindersAndCarbsModel shown above, which is what we would expect.
+
+```{r, echo=FALSE}
+resdiaulsModel <- mtcarsRegressionAnalyzerInstance$getModelResidualsOfMpgAgainstAm();
 ```
 
-As we can see from the anova() output above, the Residual Sum of Squares decreases greatly with the addition of the wt, cyl, and carb regressor variables. 
+#### Diagnostics
+We can run the dffits diagnostic to find some points which are outliers in the data. Figure 3 shows a plot of Residuals vs Fitted. We can see the three cars labeled in the plot as having large absolute diffts values below; this indicates that the predicted response in our model would be changed greatly if one of the cars listed below was removed. These cars are considered outliers in terms of our model.
+```{r, echo=FALSE}
+modelDffits <- dffits(mpgByAmAndWeightAndCylindersAndCarbsModel);
+modelDffits <- sort(modelDffits, decreasing = TRUE)
+length <- length(modelDffits)
+print(modelDffits[c(1,2,3,length)])
+```
 
-## Answering the Question of Interest
-Given our model taking into account mpg ~ am + wt + cyl + carb, we obtained a regression coefficient of 1.78, with standard error 1.51 and p value .249. As such, the coefficient is above 0 within the bounds of the standard error. Additionally, with a p value of .249, we would say with 75.1% confidence that Manual Transmissions lead to higher MPG values than Automatic transmissions. We would estimate that Manual Transmissions result in an average of 1.78 MPG greater than Automatic Transmissions.
-
-
-
+#### Quantifying the Uncertainy and performing Inference
+This was done in sections "Answering the Question of Interest" and "Regression Models" above
 
 # Appendix
-## Figure 1
 ```{r, echo=FALSE}
 mtcarsRegressionAnalyzerInstance$boxplotMpgByTransmissions();
 ```
 
-## Figure 2
 ```{r, echo=FALSE}
-mtcarsRegressionAnalyzerInstance$plotLinearModelBetweenMpgAndTransmissionUsingBase();
+amAgainstWeightCylinderCarbs <- lm(am ~ wt + cyl + carb, data = mtcars);
+        eAmAgainstWeightCylinderCarbs <- resid(amAgainstWeightCylinderCarbs);
+        mpgAgainstWeightCylinderCarbs <- lm(mpg ~ wt + cyl + carb, data = mtcars);
+        eMpgAgainstWeightCylinderCarbs <- resid(mpgAgainstWeightCylinderCarbs);
+        
+        g <- ggplot(mtcars, aes(x = eAmAgainstWeightCylinderCarbs, y = eMpgAgainstWeightCylinderCarbs))
+        g <- g + geom_point(aes(color = am), size = 2);
+        g <- g + geom_smooth(size = 3, method = "lm", se = TRUE);
+        g <- g + labs(title="Figure 2\nResiduals Plot To Show relationship\nbetween MPG and Transmission Type");
+        g <- g + labs(x="Residuals of Transmission Type\nagainst Weight, Cylinders and Carburetors");
+        g <- g + labs(y="Residuals of MPG\nagainst Weight, Cylinders and Carburetors");
+        print(g)
 ```
+
+```{r, echo=FALSE}
+plot(mpgByAmAndWeightAndCylindersAndCarbsModel, which=1, main = "Figure 3")
+```
+
+#### Figure 4
+```{r}
+summary(mpgByAmAndWeightAndCylindersModel)$coefficients;
+summary(mpgByAmAndWeightAndCylindersModel)$r.squared;
+```
+
+#### Figure 5
+```{r}
+summary(mpgByAmAndWeightAndCylindersAndCarbsModel);
+```
+
+#### Figure 6
+```{r}
+anova(mpgByAmModel, mpgByAmAndWeightAndCylindersModel, mpgByAmAndWeightAndCylindersAndCarbsModel);
+```
+
+#### Figure 7
+```{r}
+summary(mpgByAmModel)$coefficients;
+```
+
+#### Figure 8
+```{r}
+summary(resdiaulsModel)$coefficients;
+```
+
