@@ -1,4 +1,5 @@
 library(datasets);
+library(ggplot2);
 
 mtcarsRegressionAnalyzerFactory <- function()
 {
@@ -24,7 +25,7 @@ mtcarsRegressionAnalyzerFactory <- function()
         automatic_summary <- summarizeMpgByAutomaticTransmission();
         
     }
-    
+
     getAutomaticCars <- function()
     {
         automaticCarsDataFrame
@@ -39,12 +40,12 @@ mtcarsRegressionAnalyzerFactory <- function()
     {
         par(mfrow=c(1,1), oma=c(0,2,2,0))
         boxplot(mpg ~ am, data = mtcars, col=c("Blue", "Red"), range=0, boxwex = 0.4,
-                ylab="MPG", main = "MPG by Transmission", xlab="Transmission Type",
+                ylab="MPG", main = "MPG by Transmission Type", xlab="Transmission Type",
                 names=c("Automatic", "Manual"))
         legend("topleft", col=c("Blue", "Red"), legend = c("Automatic", "Manual"),
                lty=c(1,1,1), lwd=c(2.5,2.5,2.5))
-        dev.copy(png, file="mpg_by_transmission_boxplot.png")
-        dev.off();
+        #dev.copy(png, file="mpg_by_transmission_boxplot.png")
+        #dev.off();
     }
     
     historgramMpgByTransmissions <- function()
@@ -62,8 +63,8 @@ mtcarsRegressionAnalyzerFactory <- function()
             mtext("MPG by Transmission Types", outer=TRUE)
         })
         
-        dev.copy(png, file="mpg_by_transmission_histograms.png")
-        dev.off();
+        #dev.copy(png, file="mpg_by_transmission_histograms.png")
+        #dev.off();
     }
     
     executeTIntervalTest <- function()
@@ -86,7 +87,7 @@ mtcarsRegressionAnalyzerFactory <- function()
         summary(automaticCarsDataFrame$mpg);
     }
     
-    plotLinearModelBetweenMpgAndTransmission <- function()
+    plotLinearModelBetweenMpgAndTransmissionUsingBase <- function()
     {
         linearModel <- lm(mtcars$mpg ~ mtcars$am);
         mean_automatic_mpg <- mean(automaticCarsDataFrame$mpg)
@@ -104,7 +105,7 @@ mtcarsRegressionAnalyzerFactory <- function()
             abline(linearModel, lwd=2)
             abline(h=mean_automatic_mpg, lwd=1, col="Blue")
             abline(h=mean_manual_mpg, lwd=1, col="Red")
-            legend("topleft", col=c("Black", "Blue", "Red"), 
+            legend("topleft", col=c("Black", "Blue", "Red"),
                    legend=c("Linear Relationship Fit", "Automatic Empirical Mean", "Manual Empirical Mean"),
                    lty=c(1,1,1), lwd=c(2.5,2.5,2.5), cex=.85, bty="n")
             legend("bottomright", col=c("Blue", "Red"), 
@@ -112,8 +113,39 @@ mtcarsRegressionAnalyzerFactory <- function()
                    cex=.75, bty="n")
         })
         
-        dev.copy(png, file="linear_regression_plot.png")
+        #dev.copy(png, file="linear_regression_plot_using_base.png")
+        #dev.off();
+    }
+    
+    plotLinearModelBetweenMpgAndTransmissionUsingGgplot <- function()
+    {
+        linearModel <- lm(mtcars$mpg ~ mtcars$am);
+        mean_automatic_mpg <- mean(automaticCarsDataFrame$mpg)
+        mean_manual_mpg <- mean(manualCarsDataFrame$mpg)
+        mean_mpg <- c(mean_automatic_mpg, mean_manual_mpg)
+        tranmission_types <- c(0,1)
+        
+        g <- ggplot(mtcars, aes(am, mpg))
+        g <- g + geom_point()
+        g <- g + geom_smooth(method = "lm")
+        g <- g + labs(title = "MtCars MPG by Transmission Type") + labs(x = "Is Manual Transmission Type", y = "MPG")
+        print(g)
+        
+        dev.copy(png, file="linear_regression_plot_using_ggplot.png")
         dev.off();
+    }
+    
+    plotResidualsBetweenMpgAndTransmission <- function()
+    {
+        linearModel <- lm(mtcars$mpg ~ mtcars$am);
+        residuals <- resid(linearModel);
+        mtcars$residuals <- residuals;
+        
+        g <- ggplot(mtcars, aes(am, residuals))
+        g <- g + geom_point(aes(color = am), size = 2);
+        g <- g + geom_smooth(size = 3, method = "lm", se = TRUE)
+        g <- g + coord_cartesian(xlim = c(-.25, 1.25));
+        print(g)
     }
     
     list (separateAutomaticAndManualTransmissionCars = separateAutomaticAndManualTransmissionCars,
@@ -123,7 +155,9 @@ mtcarsRegressionAnalyzerFactory <- function()
           summarizeMpgByManualTransmission = summarizeMpgByManualTransmission,
           summarizeMpgByAutomaticTransmission = summarizeMpgByAutomaticTransmission,
           historgramMpgByTransmissions = historgramMpgByTransmissions,
-          plotLinearModelBetweenMpgAndTransmission = plotLinearModelBetweenMpgAndTransmission)
+          plotLinearModelBetweenMpgAndTransmissionUsingBase = plotLinearModelBetweenMpgAndTransmissionUsingBase,
+          plotLinearModelBetweenMpgAndTransmissionUsingGgplot = plotLinearModelBetweenMpgAndTransmissionUsingGgplot,
+          plotResidualsBetweenMpgAndTransmission = plotResidualsBetweenMpgAndTransmission)
 }
 
 createBoxPlot <- function()
@@ -158,10 +192,17 @@ testLinearModelPlot <- function()
 {
     mtcarsRegressionAnalyzerInstance <- mtcarsRegressionAnalyzerFactory();
     mtcarsRegressionAnalyzerInstance$separateAutomaticAndManualTransmissionCars();
-    mtcarsRegressionAnalyzerInstance$plotLinearModelBetweenMpgAndTransmission();
+    mtcarsRegressionAnalyzerInstance$plotLinearModelBetweenMpgAndTransmissionUsingGgplot();
+    mtcarsRegressionAnalyzerInstance$plotLinearModelBetweenMpgAndTransmissionUsingBase();
 }
 
-createBoxPlot()
-createHistogramPlot()
-test_interval <- testTInterval()
-testLinearModelPlot()
+plotResiduals <- function()
+{
+    mtcarsRegressionAnalyzerInstance <- mtcarsRegressionAnalyzerFactory();
+    mtcarsRegressionAnalyzerInstance$plotResidualsBetweenMpgAndTransmission();
+}
+
+#createBoxPlot()
+#createHistogramPlot()
+#test_interval <- testTInterval()
+#testLinearModelPlot()
