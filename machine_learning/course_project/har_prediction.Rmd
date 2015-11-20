@@ -1,0 +1,37 @@
+---
+title: "Human Activity Recognition Prediction"
+author: "Sean Dunagan"
+date: "November 20, 2015"
+output: html_document
+---
+```{r, echo=FALSE}
+source('./project.R');
+
+```
+## Executive Summary
+In this project, we aimed to build a prediction model that would generate predictions for data regarding the Human Activity Recognition dataset. I used Principal Component Analysis to increase the amount of information that could be gathered from the relationship between the covariates in the dataset. I used a Multinomial Regression Classification method to build the prediction model. Method getClassePredictions() in my utilities.R file executes the main portion of building the prediction model. Cross validation was used to train and test the model and generate bounds for an out-of-set error rate. 
+
+## Data Pre-Processing
+For my algorithm, I started by pruning a number of covariates in the dataset. When reading in the data from file, I considered the following values to be NA: 'NA','','#DIV/0!'. The first step was to remove all covariates in which at least 80 percent of the values were NA values. I then ran nearZeroVar() with the default parameters to remove covariates which have near zero variance since these covariates wouldn't provide value to the prediction model; this resulted in only one covariate being removed. I converted the user_name variable from a factor variable to 6 "dummy" binary variables; this allowed me to include the user_name data point in my PCA anaylsis. The next step was to remove all covariates which would not provide value to the model, or would hinder the model. I removed the X covariate, since the order in which the values were listed in the file was sorted by the classe result variable; since we can't assume that the testing data was also sorted by classe, including the X variables would likely hinder our analysis. I removed the raw_timestamp_part_2 covariate since those portions of the timestamp were essentially random in terms of their occurrence. The raw_timestamp_part_1 covariate was very indicative of the classe since dozens of rows in the dataset would contain the same raw_timestamp_part_1 and classe value. The cvtd_timestamp is a converted format of this same raw_timestamp_part_1 value, so I removed this covariate as well to reduce the noise in the model's data. 
+
+## Principal Component Analysis
+I used the preProcess(trainingSet[,-classe_index], method="pca", pcaComp=40) method (leaving out the classe variable since that is the result we are trying to predict) to produce principal component analysis on the dataset. Performing PCA allows us to potentially reduce the amount of covariates in our model. I also allows us to potentially gain more information from the same amount of covariates by exploring the relationship between the covariates.  The more PCA components we use in the model, the more accurate the model will be, but constructing the model will take longer. 
+
+## Cross Validation
+The concept behind cross validation is that we want to be able to test our prediction model on sample data before using it on the actual test set. As such, I took a portion of the training data set and set it aside to use it to test the model. This was done with createDataPartition(y=convertedArmBandData$classe, p=0.8, list=FALSE); it randomly assigned 80% of the data points to be used as training set points and 20% to be used as a test set.
+
+## Model Evaluation
+I used the confusionMatrix() method to evaluate the prediction model's results. The accuracy and confusion matrix are shown below:
+
+```{r echo=FALSE}
+accuracy_rate = armBandPredictionResults$overall[1]
+
+in_set_error_rate = 1.0 - accuracy_rate
+
+print(paste0("Accuracy Rate: ", accuracy_rate))
+print(paste0("In-Set Error Rate: ", in_set_error_rate))
+print("Confusion Matrix")
+armBandPredictionResults$table
+```
+
+The accuracy shown here is considered the in-set error rate, because it is the error rate we experienced regarding the data in our training set. The testing set will contain different data points than those in our training set. Since our model was built against the data in the training set, we would expect it to perform worse on a different set of data. As such, we would expect the out-of-set error rate to be greater than our in-set error rate.
