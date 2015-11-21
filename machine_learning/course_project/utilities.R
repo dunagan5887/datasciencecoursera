@@ -2,7 +2,7 @@ getClassePredictions <- function(trainingSet, testingSet)
 {
     classe_index <- getColumnIndexByLabel("classe", variantArmBandData)
     # We don't want to include the result variable in our Principal Component Analysis
-    preProcessedTrainingSet <- preProcess(trainingSet[,-classe_index], method="pca", pcaComp=40)
+    preProcessedTrainingSet <- preProcess(trainingSet[,-classe_index], method="pca", pcaComp=45)
     trainingSetPredictions <- predict(preProcessedTrainingSet, trainingSet[,-classe_index])
     # Train our data set using our Principal Components data and a Multinomial method
     armBandPredictionModel <- train(trainingSet$classe ~ ., method="multinom",data=trainingSetPredictions)

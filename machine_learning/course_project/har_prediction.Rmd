@@ -34,4 +34,5 @@ print("Confusion Matrix")
 armBandPredictionResults$table
 ```
 
+## Out of Set Error Rate
 The accuracy shown here is considered the in-set error rate, because it is the error rate we experienced regarding the data in our training set. The testing set will contain different data points than those in our training set. Since our model was built against the data in the training set, we would expect it to perform worse on a different set of data. As such, we would expect the out-of-set error rate to be greater than our in-set error rate.
