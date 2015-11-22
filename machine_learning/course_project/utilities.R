@@ -5,7 +5,7 @@ getClassePredictions <- function(trainingSet, testingSet)
     preProcessedTrainingSet <- preProcess(trainingSet[,-classe_index], method="pca", pcaComp=10)
     trainingSetPredictions <- predict(preProcessedTrainingSet, trainingSet[,-classe_index])
     # Train our data set using our Principal Components data and a Multinomial method
-    armBandPredictionModel <- train(trainingSet$classe ~ ., method="multinom",data=trainingSetPredictions)
+    armBandPredictionModel <- train(trainingSet$classe ~ ., method="glm",data=trainingSetPredictions)
     # Generate predictions for the testing set with our model
     preProcessedTestingSet <- predict(preProcessedTrainingSet, testingSet[,-classe_index])
     testingSetPredictions <- predict(armBandPredictionModel, newdata=preProcessedTestingSet)
@@ -54,8 +54,8 @@ filterOutIrrelevantVariantColumns <- function(variantArmBandData)
     user_name_index <- getColumnIndexByLabel("user_name", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-user_name_index]
     
-    num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
-    relevantColumnsData <- relevantColumnsData[,-num_window_index]
+    #num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
+    #relevantColumnsData <- relevantColumnsData[,-num_window_index]
     
     # This column is arbitrary data that will introduce noise into our model
     X_index <- getColumnIndexByLabel("X", relevantColumnsData)
