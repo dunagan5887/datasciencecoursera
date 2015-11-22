@@ -45,16 +45,21 @@ filterOutIrrelevantVariantColumns <- function(variantArmBandData)
     cvtd_timestamp_index <- getColumnIndexByLabel("cvtd_timestamp", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-cvtd_timestamp_index]
     
+    timestamp_1_index <- getColumnIndexByLabel("raw_timestamp_part_1", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-timestamp_1_index]
+    
     timestamp_2_index <- getColumnIndexByLabel("raw_timestamp_part_2", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-timestamp_2_index]
     
     user_name_index <- getColumnIndexByLabel("user_name", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-user_name_index]
     
+    num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-num_window_index]
+    
     # This column is arbitrary data that will introduce noise into our model
     X_index <- getColumnIndexByLabel("X", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-X_index]
-    
     relevantColumnsData
 }
 # This method removes covariates whose values are at least 80% NA
@@ -97,19 +102,6 @@ getRowsWithFullData <- function(armBandData, na_ratio_threshold=0.3)
     row_is_full_data_list = c()
     
     row_is_full_data_list = apply(armBandData, 1, isRowFullData)
-    "
-    for (i in 1:number_of_rows)
-    {
-        row_of_data = armBandData[i,]
-        na_values_in_row = is.na(row_of_data)
-        number_of_na_values = sum(na_values_in_row == TRUE)
-        ratio_of_na_values <- number_of_na_values / number_of_columns
-        row_is_full_data <- ratio_of_na_values < na_ratio_threshold
-        row_is_full_data_list <- c(row_is_full_data_list, row_is_full_data)
-    }
-    nonNaArmBandData = armBandData[!row_is_na_list,]
-    nonNaArmBandData
-"
     fullDataFrame = armBandData[row_is_full_data_list,]
     fullDataFrame
 }
