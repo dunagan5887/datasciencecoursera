@@ -4,10 +4,6 @@ author: "Sean Dunagan"
 date: "November 20, 2015"
 output: html_document
 ---
-```{r, echo=FALSE}
-source('./project.R');
-
-```
 ## Executive Summary
 In this project, we aimed to build a prediction model that would generate predictions for data regarding the Human Activity Recognition dataset. I used Principal Component Analysis to increase the amount of information that could be gathered from the relationships between the covariates in the dataset. I used a Multinomial Regression Classification method to build the prediction model. Cross validation was used to train and test the model and generate bounds for an out-of-set error rate.
 
@@ -23,3 +19,7 @@ I performed ten iterations of this process, generating a new random seed generat
 
 ## Out of Set Error
 If we delcare the accuracy after the 10 iterations to be the in-set-accuracy, then 1-in-set-accuracy would be the in-set error rate. This is the error rate regarding the set of data that we used to train the classifier. The error rate we experience while predicting on the testing set is the out-of-set error rate, since this data is outside of the set of data we used to train the model. Given that this set of data is separate from the one that we trained our model with, we expect the out of sample error rate to be ABOVE the in-set error rate.
+
+The github repo directory containing my file for the project can be found at the link below. The full_data_rows.R file was the one used to build/train the model, not project.R
+
+https://github.com/dunagan5887/datasciencecoursera/tree/ml_cp_all_data/machine_learning/course_project
