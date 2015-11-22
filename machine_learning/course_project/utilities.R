@@ -48,6 +48,12 @@ filterOutIrrelevantVariantColumns <- function(variantArmBandData)
     timestamp_2_index <- getColumnIndexByLabel("raw_timestamp_part_2", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-timestamp_2_index]
     
+    timestamp_1_index <- getColumnIndexByLabel("raw_timestamp_part_1", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-timestamp_1_index]
+    
+    num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-num_window_index]
+    
     # This column is arbitrary data that will introduce noise into our model
     X_index <- getColumnIndexByLabel("X", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-X_index]
@@ -86,3 +92,15 @@ getColumnIndexByLabel <- function(column_label, dataFrame)
     column_label <- grep(column_label, colnames(dataFrame))
     column_label
 }
+
+getCorrelatedColumns <- function(relevantArmBandData)
+{
+    #classe_index <- getColumnIndexByLabel("classe", variantArmBandData)
+    M <- abs(cor(relevantArmBandData))
+    diag(M) <- 0
+    correlated_columns = which (M > 0.8, arr.ind=T)
+    correlated_columns
+}
+
+
+
