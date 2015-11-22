@@ -1,7 +1,10 @@
 library(caret);
 source('./utilities.R')
 
-set.seed(23232)
+seed_number <- runif(1, 1, 10000)
+seed_number <- as.integer(seed_number)
+set.seed(seed_number)
+
 
 na_values = c('NA','','#DIV/0!')
 armBandData = read.csv('pml-training.csv', na.strings=na_values)

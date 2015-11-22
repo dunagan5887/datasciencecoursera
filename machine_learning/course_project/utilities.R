@@ -1,8 +1,8 @@
 getClassePredictions <- function(trainingSet, testingSet)
 {
-    classe_index <- getColumnIndexByLabel("classe", variantArmBandData)
+    classe_index <- getColumnIndexByLabel("classe", trainingSet)
     # We don't want to include the result variable in our Principal Component Analysis
-    preProcessedTrainingSet <- preProcess(trainingSet[,-classe_index], method="pca", pcaComp=40)
+    preProcessedTrainingSet <- preProcess(trainingSet[,-classe_index], method="pca", pcaComp=10)
     trainingSetPredictions <- predict(preProcessedTrainingSet, trainingSet[,-classe_index])
     # Train our data set using our Principal Components data and a Multinomial method
     armBandPredictionModel <- train(trainingSet$classe ~ ., method="multinom",data=trainingSetPredictions)
@@ -48,6 +48,9 @@ filterOutIrrelevantVariantColumns <- function(variantArmBandData)
     timestamp_2_index <- getColumnIndexByLabel("raw_timestamp_part_2", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-timestamp_2_index]
     
+    user_name_index <- getColumnIndexByLabel("user_name", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-user_name_index]
+    
     # This column is arbitrary data that will introduce noise into our model
     X_index <- getColumnIndexByLabel("X", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-X_index]
@@ -85,4 +88,39 @@ getColumnIndexByLabel <- function(column_label, dataFrame)
 {
     column_label <- grep(column_label, colnames(dataFrame))
     column_label
+}
+
+getRowsWithFullData <- function(armBandData, na_ratio_threshold=0.3)
+{
+    number_of_rows = nrow(armBandData)
+    number_of_columns = ncol(armBandData)
+    row_is_full_data_list = c()
+    
+    row_is_full_data_list = apply(armBandData, 1, isRowFullData)
+    "
+    for (i in 1:number_of_rows)
+    {
+        row_of_data = armBandData[i,]
+        na_values_in_row = is.na(row_of_data)
+        number_of_na_values = sum(na_values_in_row == TRUE)
+        ratio_of_na_values <- number_of_na_values / number_of_columns
+        row_is_full_data <- ratio_of_na_values < na_ratio_threshold
+        row_is_full_data_list <- c(row_is_full_data_list, row_is_full_data)
+    }
+    nonNaArmBandData = armBandData[!row_is_na_list,]
+    nonNaArmBandData
+"
+    fullDataFrame = armBandData[row_is_full_data_list,]
+    fullDataFrame
+}
+
+isRowFullData <- function(row_of_data)
+{
+    na_ratio_threshold=0.3
+    na_values_in_row = is.na(row_of_data)
+    number_of_na_values = sum(na_values_in_row == TRUE)
+    number_of_columns = ncol(armBandData)
+    ratio_of_na_values <- number_of_na_values / number_of_columns
+    row_is_full_data <- ratio_of_na_values < na_ratio_threshold
+    row_is_full_data
 }
