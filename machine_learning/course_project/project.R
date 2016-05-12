@@ -1,6 +1,8 @@
 library(caret);
 source('./utilities.R')
 
+#seed_number <- runif(1, 1, 10000)
+#seed_number <- as.integer(seed_number)
 set.seed(23232)
 
 na_values = c('NA','','#DIV/0!')
