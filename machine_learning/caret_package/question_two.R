@@ -7,6 +7,10 @@ inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
 training = mixtures[ inTrain,]
 testing = mixtures[-inTrain,]
 
+modfit <- train(CompressiveStrength ~ FlyAsh, method='lm', data=concrete)
+finMod <- modfit$finalModel
+plot(finMod$residuals,pch=19)
+
 featurePlot(x=training[,c("Superplasticizer","CoarseAggregate")],
             y = training$CompressiveStrength,
             plot="pairs")
