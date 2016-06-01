@@ -15,22 +15,22 @@ getClassePredictions <- function(trainingSet, testingSet)
 convertUsernameToBinaryVariables <- function(variantArmBandData)
 {
     is_adelmo <- variantArmBandData$user_name == 'adelmo'
-    variantArmBandData$is_adelmo <- as.numeric(is_adelmo)
+    #variantArmBandData$is_adelmo <- as.numeric(is_adelmo)
     
     is_carlitos <- variantArmBandData$user_name == 'carlitos'
-    variantArmBandData$is_carlitos <- as.numeric(is_carlitos)
+    #variantArmBandData$is_carlitos <- as.numeric(is_carlitos)
     
     is_pedro <- variantArmBandData$user_name == 'pedro'
-    variantArmBandData$is_pedro <- as.numeric(is_pedro)
+    #variantArmBandData$is_pedro <- as.numeric(is_pedro)
     
     is_jeremy <- variantArmBandData$user_name == 'jeremy'
-    variantArmBandData$is_jeremy <- as.numeric(is_jeremy)
+    #variantArmBandData$is_jeremy <- as.numeric(is_jeremy)
     
     is_eurico <- variantArmBandData$user_name == 'eurico'
-    variantArmBandData$is_eurico <- as.numeric(is_eurico)
+    #variantArmBandData$is_eurico <- as.numeric(is_eurico)
     
     is_charles <- variantArmBandData$user_name == 'charles'
-    variantArmBandData$is_charles <- as.numeric(is_charles)
+    #variantArmBandData$is_charles <- as.numeric(is_charles)
     
     user_name_index <- getColumnIndexByLabel("user_name", variantArmBandData)
     variantArmBandData <- variantArmBandData[,-user_name_index]
@@ -51,11 +51,8 @@ filterOutIrrelevantVariantColumns <- function(variantArmBandData)
     timestamp_2_index <- getColumnIndexByLabel("raw_timestamp_part_2", relevantColumnsData)
     relevantColumnsData <- relevantColumnsData[,-timestamp_2_index]
     
-    user_name_index <- getColumnIndexByLabel("user_name", relevantColumnsData)
-    relevantColumnsData <- relevantColumnsData[,-user_name_index]
-    
-    #num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
-    #relevantColumnsData <- relevantColumnsData[,-num_window_index]
+    num_window_index <- getColumnIndexByLabel("num_window", relevantColumnsData)
+    relevantColumnsData <- relevantColumnsData[,-num_window_index]
     
     # This column is arbitrary data that will introduce noise into our model
     X_index <- getColumnIndexByLabel("X", relevantColumnsData)

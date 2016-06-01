@@ -1,8 +1,9 @@
 library(AppliedPredictiveModeling)
 data(segmentationOriginal)
 library(caret)
+library(rpart)
 
-in_training_set <- createDataPartition(y=segmentationOriginal$Case, list=FALSE)
+in_training_set = (segmentationOriginal$Case == "Train") 
 trainingSet <- segmentationOriginal[in_training_set,]
 testingSet <- segmentationOriginal[-in_training_set,]
 
@@ -13,7 +14,9 @@ set.seed(125)
 tree <- rpart(Class ~ ., data=trainingSet)
 
 #a. PS
-#b. 
+#b. WS
+#c. PS
+#d. Not possible
 
 
 #modelFit <- train(Class ~ ., method="rpart", data=segmentationOriginal)
