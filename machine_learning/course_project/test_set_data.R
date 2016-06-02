@@ -6,15 +6,12 @@ set.seed(123)
 na_values = c('NA','','#DIV/0!')
 # Import the data from the file
 armBandData = read.csv('pml-training.csv', na.strings=na_values)
-# Remove columns which are mostly NA
-nonNaArmBandData <- removeColumnsThatAreMostlyNA(armBandData)
+# Remove columns which have NA values
+nonNaArmBandData <- removeColumnsThatHaveNAValues(armBandData)
 # Remove columns which have low variance, meaning they offer little information gain
 variantArmBandData <- filterOutNonVariantColumns(nonNaArmBandData)
-# Convert the username column into six columns representing binary variables
-# This allows the data point to be included in Principal Component Analysis
-convertedArmBandData <- convertUsernameToBinaryVariables(variantArmBandData)
 # Remove columns that don't appear to be relevant to the class
-relevantArmBandData <- filterOutIrrelevantVariantColumns(convertedArmBandData)
+relevantArmBandData <- filterOutIrrelevantVariantColumns(variantArmBandData)
 
 inTrain <- createDataPartition(y=relevantArmBandData$classe, p=0.8, list=FALSE)
 
@@ -26,11 +23,11 @@ classe_index <- getColumnIndexByLabel("classe", trainingSet)
 # We don't want to include the result variable in our Principal Component Analysis
 
 
-data_to_pre_process = trainingSet[,-classe_index]
-number_of_possible_predictors <- ncol(data_to_pre_process)
+#data_to_pre_process = trainingSet[,-classe_index]
+#number_of_possible_predictors <- ncol(data_to_pre_process)
 
 
-pcaCovariateSet <- preProcess(data_to_pre_process, method="pca", pcaComp=number_of_possible_predictors)
+pcaCovariateSet <- preProcess(data_to_pre_process, method="pca", pcaComp=12)
 trainingSetPredictions <- predict(pcaCovariateSet, trainingSet[,-classe_index])
 # Train our data set using our Principal Components data and a Multinomial method
 armBandPredictionModel <- train(trainingSet$classe ~ ., method="gbm",data=trainingSetPredictions)
@@ -40,10 +37,9 @@ testingSetPredictions <- predict(armBandPredictionModel, newdata=preProcessedTes
 armBandPredictionResults <- confusionMatrix(testingSet$classe, testingSetPredictions)
 
 TESTtestSetData = read.csv('pml-testing.csv', na.strings=na_values)
-TESTnonNaArmBandData <- removeColumnsThatAreMostlyNA(TESTtestSetData)
+TESTnonNaArmBandData <- removeColumnsThatHaveNAValues(TESTtestSetData)
 TESTvariantArmBandData <- filterOutNonVariantColumns(TESTnonNaArmBandData)
-TESTconvertedArmBandData <- convertUsernameToBinaryVariables(TESTvariantArmBandData)
-TESTrelevantTestArmBandData <- filterOutIrrelevantVariantColumns(TESTconvertedArmBandData)
+TESTrelevantTestArmBandData <- filterOutIrrelevantVariantColumns(TESTvariantArmBandData)
 
 # Generate predictions for the testing set with our model
 problem_id_index <- getColumnIndexByLabel("problem_id", TESTtestSetData)
