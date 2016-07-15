@@ -141,7 +141,9 @@ $(document).ready(function () {
 </div>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>
-<p>The concept behind cross validation is that we want to be able to test our prediction model on sample data before using it on the actual test set. As such, I took a portion of the training data set and set it aside to use it to test the model. This was done with createDataPartition(y=relevantArmBandData$classe, p=0.8, list=FALSE); it randomly assigned 80% of the data points to be used as training set points and 20% to be used as a test set.</p>
+<p>The concept behind cross validation is that we want to be able to test our prediction model on sample data before using it on the actual test set. As such, I took a portion of the training data set and set it aside to use it to test the model. This was done with</p>
+<pre class="r"><code>createDataPartition(y=relevantArmBandData$classe, p=0.8, list=FALSE); </code></pre>
+<p>It randomly assigned 80% of the data points to be used as training set points and 20% to be used as a test set.</p>
 </div>
 <div id="model-evaluation" class="section level2">
 <h2>Model Evaluation</h2>

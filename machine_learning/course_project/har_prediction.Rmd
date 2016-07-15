@@ -35,7 +35,11 @@ A number of columns did not seem like they would be relevant in terms of determi
 Principal Component Analysis was used on the covariates in the dataset which were chosen to build the model. This was done to allow for ample information gain regarding the covariates. The tradeoff here is training-set accuracy vs overfitting and clarity. The more components which are used, the more accurate the model will be on the training set. However, this may lead to overfitting on the training set, resulting in less accuracy on the out-of-sample set. A model with many PCA components would also be more difficult to interperet or communicate. More components will also result in the model taking longer to construct.I decided to simply use the "pca" preProcess method in the R train() function. 
 
 ## Cross Validation
-The concept behind cross validation is that we want to be able to test our prediction model on sample data before using it on the actual test set. As such, I took a portion of the training data set and set it aside to use it to test the model. This was done with createDataPartition(y=relevantArmBandData$classe, p=0.8, list=FALSE); it randomly assigned 80% of the data points to be used as training set points and 20% to be used as a test set.
+The concept behind cross validation is that we want to be able to test our prediction model on sample data before using it on the actual test set. As such, I took a portion of the training data set and set it aside to use it to test the model. This was done with
+``` {r eval=FALSE}
+createDataPartition(y=relevantArmBandData$classe, p=0.8, list=FALSE); 
+```
+It randomly assigned 80% of the data points to be used as training set points and 20% to be used as a test set.
 
 ## Model Evaluation
 I used the confusionMatrix() method to evaluate the prediction model's results. The accuracy and confusion matrix are shown below:
